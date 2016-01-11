@@ -1,10 +1,8 @@
 **Problem-1:** 
 
 Find the optimal solution of the LPP (1)
-    
-    Max/Min: Z = C^T(X)
-    Subject to: AX= b
-	X >= 0
+
+![equation](http://www.sciweavers.org/upload/Tex2Img_1452522870/render.png)  
 
 using Basic Feasible Solution Method.
 
