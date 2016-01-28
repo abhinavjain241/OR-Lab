@@ -11,6 +11,7 @@
 #include <malloc.h>
 #include <assert.h>
 #include <math.h>
+#include <stdlib.h>
 
 #define SIZE 15
 
@@ -20,15 +21,14 @@ int x[SIZE]; // Swap Hash for upto SIZE variables
 
 void swap(double **, int, int, int);
 int calculateRank(int, int);
-void printMatrix(double **, int, int);
-void printStaticMatrix(double [][SIZE], int, int);
+void printMatrix(double [][SIZE], int, int);
 void getMatrix(double **, int, int);
 double** augmentMatrices(double **, double **, int, int);
-long long Comb(int , int);
 void getMinimum(int, int);
 void getMaximum(int, int);
 void solve(int);
 int checkNegative(double [][SIZE], int, int);
+bool checkInfiniteSolutions(double [][SIZE], int, int);
 
 int main(){
     /* Get Objective Function Z */
@@ -67,7 +67,7 @@ int main(){
     }
     // Objective Function Coefficients and Constant [ 1 x (n + 1) ]
     double **C = (double **)malloc((n + 1) * sizeof(double *));
-    for(i = 0; i < m; i++)
+    for(i = 0; i < n + 1; i++)
         C[i] = (double *)malloc(sizeof(double));
     printf("Enter coefficients of objective function along with the constant:");
     getMatrix(C, n + 1, 1);
@@ -78,19 +78,27 @@ int main(){
     copied[m][n] = C[n][0];
     /* At this point, copied[][] contains the simplex tableau. */
     printf("Current State of Simplex Tableau:\n");
-    printStaticMatrix(copied, m + 1, n + 1);
-    while(checkNegative(copied, m + 1, n + 1) >= 0) {
+    printMatrix(copied, m + 1, n + 1);
+    if(checkInfiniteSolutions(copied, m + 1, n + 1)) {
+        printf("\nThe system has infinite solutions!\nTerminating program...");
+        exit(0);
+    }
+    while(checkNegative(copied, m + 1, n + 1) >= 0) { // Only if last row is negative
         double min = 99999; int pRow = 0; double pivot = 0; bool infeasible = true;
         int pCol = checkNegative(copied, m + 1, n + 1);
-        // std::cout << pCol << std::endl;
-        for(i = 0; i < m; i++) {
-            double ratio = copied[i][n] / copied[i][pCol];
-            if(ratio >= 0) {
-                infeasible = false;
-                if (ratio < min) {
-                    min = copied[i][n] / copied[i][pCol];
-                    pRow = i;
-                } 
+        for(j = 0; j < n; j++) {
+            if (copied[m][j] == copied[m][pCol]) {// If there are multiple instances of minimum
+                for(i = 0; i < m; i++) {
+                    double ratio = copied[i][n] / copied[i][j];
+                    if(ratio >= 0) {
+                        infeasible = false;
+                        if (ratio < min) {
+                            min = copied[i][n] / copied[i][j];
+                            pRow = i;
+                            pCol = j;
+                        } 
+                    }
+                }
             }
         }
         if(infeasible){
@@ -118,7 +126,7 @@ int main(){
         }
         copied[pRow][pCol] = 1 / pivot;
         printf("\nCurrent State of Simplex Tableau:\n");
-        printStaticMatrix(copied, m + 1, n + 1);
+        printMatrix(copied, m + 1, n + 1);
     }
     // Print Value of x(i)
     for(i = 0; i < n; i++) {
@@ -126,17 +134,8 @@ int main(){
     } 
     printf("\nMaximum Value of LPP is: %lf\n", copied[m][n]);
 }
- 
-void printMatrix(double **A, int rows, int cols) {  
-    int i, j;
-    for(i = 0; i < rows; i++) {
-        printf("\n");
-        for(j = 0; j < cols; j++)
-            printf("%lf ", A[i][j]);
-    }
-}
 
-void printStaticMatrix(double A[][SIZE], int rows, int cols) {  
+void printMatrix(double A[][SIZE], int rows, int cols) {  
     int i, j;
     for(i = 0; i < rows; i++) {
         printf("\n");
@@ -168,7 +167,7 @@ double** augmentMatrices(double **A, double **b, int m, int n) {
 
 int checkNegative(double A[][SIZE], int rows, int cols){
     double min = 0; bool flag = false; int min_index = 0;
-    for(int i = rows - 1, j = 0; j < cols; j++) {
+    for(int i = rows - 1, j = 0; j < cols - 1; j++) {
         if(A[i][j] < 0) {
             flag = true;
             if(A[i][j] < min) {
@@ -183,3 +182,10 @@ int checkNegative(double A[][SIZE], int rows, int cols){
         return -1;  // If no number < 0 
 }
 
+bool checkInfiniteSolutions(double A[][SIZE], int rows, int cols){
+    bool hasInfinite = false;
+    for(int i = rows - 1, j = 0; j < cols - 1; j++)
+        if (A[i][j] == 0)
+            hasInfinite = true;
+    return hasInfinite;
+}
