@@ -11,6 +11,8 @@
 #include <assert.h>
 #include <math.h>
 
+#define SIZE 15
+
 void swap(double **, int, int, int);
 int calculateRank(int, int);
 void printMatrix(double **, int, int);
@@ -21,18 +23,19 @@ void getMin(int, int);
 void getMax(int, int);
 void solve(int);
 
-double d[10] = { 0 };
-double copied[10][10], ans[10][10], z[10];
+double d[SIZE] = { 0 };
+double copied[SIZE][SIZE], ans[SIZE][SIZE], z[SIZE];
 
 int main() {
 	/* Get Objective Function Z */
 	int n, m;	//Number of variables and number of equations
 	int i, j; // Dummy variables
 	int rank, rank_aug;
-    int choice;
+    int choice, n_updated;
 	printf("Enter number of variables in the system:\n");
 	scanf("%d", &n);
-    printf("Choose type of constraint system:\n1. AX = b\n.2 AX < b\n 3. AX > b\n");
+    n_updated = n;
+    printf("Choose type of constraint system:\n1. AX = b\n2. AX < b\n3. AX > b\n");
     scanf("%d", &choice);
     switch(choice) {
         case 1:
@@ -42,52 +45,71 @@ int main() {
         case 2:
             printf("Enter number of in-equations in the system\n");
             scanf("%d", &m);
-            n += m; //Add slack variables
+            n_updated += m; //Add slack variables
         break;
         case 3:
             printf("Enter number of in-equations in the system\n");
             scanf("%d", &m);
-            n += m; //Add slack variables
+            n_updated += m; //Add slack variables
         break;
         default:
         printf("Wrong choice");
 
     }
-	assert(n > m); // Number of variables should be more than the constraints
-	int nbasic = n - m; // Number of non-basic variables 
+	assert(n_updated > m); // Number of variables should be more than the constraints
+	int nbasic = n_updated - m; // Number of non-basic variables 
 	// Coefficient matrix
 	double **A = (double **)malloc(m * sizeof(double *));
 	for(i = 0; i < m; i++)
-		A[i] = (double *)malloc(n * sizeof(double));
+		A[i] = (double *)malloc(n_updated * sizeof(double));
 	// Output matrix (Y - values)
 	double **B = (double **)malloc(m * sizeof(double *));
 	for(i = 0; i < m; i++)
 		B[i] = (double *)malloc(sizeof(double));
 	printf("Enter coefficients of constraints equations in matrix form:");
 	getMatrix(A, m, n); // Get A
+    if(choice == 2) {
+        for(i = 0; i < m; i++) {
+            for(j = n; j < n_updated; j++) {
+                if(i + j == n_updated - n)
+                    A[i][j] = 1;
+                else
+                    A[i][j] = 0;
+            }
+        }
+    } else if (choice == 3) {
+        for(i = 0; i < m; i++) {
+            for(j = n; j < n_updated; j++) {
+                if(i + j == n_updated - n)
+                    A[i][j] = -1;
+                else
+                    A[i][j] = 0;
+            }
+        }
+    }
 	printf("Enter the right side values of the equations:");
 	getMatrix(B, m, 1); // Get B
 	for(i = 0 ; i < m; i++) {
-		for(j = 0 ; j < n; j++){
+		for(j = 0 ; j < n_updated; j++){
 	        	copied[i][j] = A[i][j];
 		}
-    	}
-	rank = calculateRank(m, n);;
-	double **C = augmentMatrices(A, B, m, n); // Make (A | b)
+    }
+	rank = calculateRank(m, n_updated);
+	double **C = augmentMatrices(A, B, m, n_updated); // Make (A | b)
 	for(i = 0 ; i < m; i++) {
-		for(j = 0 ; j <= n; j++){
+		for(j = 0 ; j <= n_updated; j++){
 	        	copied[i][j] = C[i][j];
 		}
-    	}
-	rank_aug = calculateRank(m, n + 1);
+    }
+	rank_aug = calculateRank(m, n_updated + 1);
 	printf("Rank of A is : %d \n", rank);
         printf("Rank of A | b is : %d \n", rank_aug);
 	if(rank != rank_aug) {
     		printf("No solution!\n");
     		return 0;
     	}
-	int mo = n - rank;
-    int pw2 = (int)pow(2, n);
+	int mo = n_updated - rank;
+    int pw2 = (int)pow(2, n_updated);
     int cnt1 = 0, v, solInd = 0, ind = 0;
     for(int i = 1 ; i < pw2 ; i++){
     	v = i;
@@ -96,19 +118,19 @@ int main() {
     		cnt1 = cnt1 + v%2;
     		v = v/2;
     	}
-    	if(cnt1 != (n - mo))
+    	if(cnt1 != (n_updated - mo))
     		continue;
     	for(int k = 0 ; k < rank ; k++)
     	{
     		v = i;
     		ind = 0;
-        	for(j = 0 ; j < n ; j++){
+        	for(j = 0 ; j < n_updated ; j++){
         		if(v%2 == 1){
         			copied[k][ind++] = C[k][j];
         		}
         		v = v/2;
         	}
-        	copied[k][ind] = C[k][n];
+        	copied[k][ind] = C[k][n_updated];
         }
         if(calculateRank(cnt1, cnt1) != cnt1)
             continue;
@@ -116,18 +138,18 @@ int main() {
         {
             v = i;
             ind = 0;
-            for(j = 0 ; j < n ; j++){
+            for(j = 0 ; j < n_updated ; j++){
                 if(v%2 == 1){
                     copied[k][ind++] = C[k][j];
                 }
                 v = v/2;
             }
-            copied[k][ind] = C[k][n];
+            copied[k][ind] = C[k][n_updated];
         }
         ind = 0;
-        solve(n - mo);
+        solve(n_updated - mo);
         v = i;
-    	for(j = 0 ; j < n ; j++){
+    	for(j = 0 ; j < n_updated ; j++){
     		if(v%2 == 1){
     			ans[solInd][j] = d[ind++];
     		}
@@ -141,7 +163,7 @@ int main() {
     // Print Basic Feasible Solutions
     for(int k = 0 ; k < solInd ; k++){
         int check = 1;
-        for(int l = 0 ; l < n ; l++){
+        for(int l = 0 ; l < n_updated ; l++){
             if(ans[k][l] < 0){
                 check = 0;
                 break;
@@ -150,7 +172,7 @@ int main() {
         if(check != 1)
             continue;
         printf("One BFS is ");
-        for(int l = 0 ; l < n ; l++){
+        for(int l = 0 ; l < n_updated ; l++){
             printf("%6.2f ", ans[k][l]);
         }
         printf("\n");
@@ -165,9 +187,9 @@ int main() {
     printf("Enter 1 for maximum, 2 for minimum, 3 to get both \n");
     scanf("%d", &bl);
     if(bl & (1 << 1))
-        getMin(solInd, n);
+        getMin(solInd, n_updated);
 	if(bl&1)
-        getMax(solInd, n);
+        getMax(solInd, n_updated);
 	// Free dynamically allocated memory 
 	free(A);
 	free(B);
