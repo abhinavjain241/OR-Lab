@@ -17,8 +17,8 @@ void printMatrix(double **, int, int);
 void getMatrix(double **, int, int);
 double** augmentMatrices(double **, double **, int, int);
 long long Comb(int , int);
-void getMinimum(int, int);
-void getMaximum(int, int);
+void getMin(int, int);
+void getMax(int, int);
 void solve(int);
 
 double d[10] = { 0 };
@@ -26,14 +26,13 @@ double copied[10][10], ans[10][10], z[10];
 
 int main() {
 	/* Get Objective Function Z */
-	int n;	//Number of variables
-	int m;	//Number of equations
+	int n, m;	//Number of variables and number of equations
 	int i, j; // Dummy variables
 	int rank, rank_aug;
 	printf("Enter number of variables in the system:\n");
 	scanf("%d", &n);
-	printf("Enter number of equations in the system\n");
-	scanf("%d", &m);
+    printf("Enter number of equations in the system\n");
+    scanf("%d", &m);
 	assert(n > m); // Number of variables should be more than the constraints
 	int nbasic = n - m; // Number of non-basic variables 
 	// Coefficient matrix
@@ -146,15 +145,9 @@ int main() {
     printf("Enter 1 for maximum, 2 for minimum, 3 to get both \n");
     scanf("%d", &bl);
     if(bl & (1 << 1))
-        getMinimum(solInd, n);
+        getMin(solInd, n);
 	if(bl&1)
-        getMaximum(solInd, n);
-	// Number of possible cases or basic solutions
-	//long long basic_sols = Comb(n, m);
-	// Solution matrix containing basic solutions to the problem
-	//double **solution = (double **)malloc(m * sizeof(double *));
-	//for(i = 0; i < m; i++)
-		//solution[i] = (double *)malloc(basic_sols * sizeof(double));
+        getMax(solInd, n);
 	// Free dynamically allocated memory 
 	free(A);
 	free(B);
@@ -176,8 +169,7 @@ double** augmentMatrices(double **A, double **b, int m, int n) {
 	return result;
 }
 
-void swap(int r1, int r2, int cols)
-{
+void swap(int r1, int r2, int cols) {
 	int i;
     for(i = 0; i < cols; i++) {
         double temp = copied[r1][i];
@@ -186,18 +178,17 @@ void swap(int r1, int r2, int cols)
     }
 }
 
-int calculateRank(int R, int C)
-{
+int calculateRank(int R, int C) {
 	int rank = C;
 	for (int row = 0; row < rank; row++) {
 		if (copied[row][row]) {
-		for (int col = 0; col < R; col++) {
-			if (col != row) {
-				double mult = (double)copied[col][row] / copied[row][row];
-				for (int i = 0; i < rank; i++)
-					copied[col][i] -= mult * copied[row][i];
-			}
-		}
+    		for (int col = 0; col < R; col++) {
+    			if (col != row) {
+    				double mult = (double)copied[col][row] / copied[row][row];
+    				for (int i = 0; i < rank; i++)
+    					copied[col][i] -= mult * copied[row][i];
+    			}
+    		}
 		} else {
 			bool reduce = true;
 			for (int i = row + 1; i < R; i++) {
@@ -245,7 +236,7 @@ long long Comb(int n, int r) {
     return ans;
 }
 
-void getMinimum(int solInd, int var) {
+void getMin(int solInd, int var) {
     double mnanswer = 999999.0, curr = 0;
     for(int k = 0 ; k < solInd ; k++) {
         int check = 1;
@@ -267,7 +258,7 @@ void getMinimum(int solInd, int var) {
     printf("The minimum is %6.1f\n", mnanswer);
 }
 
-void getMaximum(int solInd, int var) {
+void getMax(int solInd, int var) {
     double mxanswer = 0.0, curr = 0;
     for(int k = 0 ; k < solInd ; k++) {
         int check = 1;
@@ -289,27 +280,23 @@ void getMaximum(int solInd, int var) {
     printf("The maximum is %6.1f\n", mxanswer);
 }
 
-void solve(int n){
+void solve(int n) {
     double  c;
     int i, j, k;
     for(int i = 0 ; i < 10 ; i++)
     	d[i] = 0;
     for(k = 0 ; k < n - 1 ; k++)
-        for(i = k ; i < n - 1 ; i++)
-        {
-            c = (copied[i + 1][k] / copied[k][k]) ;
-            
+        for(i = k ; i < n - 1 ; i++) {
+            c = (copied[i + 1][k] / copied[k][k]);
             for(j = 0 ; j <= n ; j++)
-                copied[i + 1][j] -= c*copied[k][j];
+                copied[i + 1][j] -= c * copied[k][j];
         }
-    for(i = 0; i < n; i++)
-    {
-        for(j=0;j<=n;j++)
+    for(i = 0; i < n; i++) {
+        for(j = 0; j <= n; j++)
             printf("%6.1f",copied[i][j]);
         printf("\n");
     }
-    for(i = n - 1 ; i >= 0 ; i--)
-    {
+    for(i = n - 1 ; i >= 0 ; i--) {
         c = 0;
         for( j = i ; j <= n - 1 ; j++)
             c = c + copied[i][j] * d[j];
