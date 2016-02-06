@@ -1,4 +1,6 @@
 *.o
+printout*
 solver
 simplex
 extended-solver
+BigM
