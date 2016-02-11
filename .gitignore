@@ -4,3 +4,4 @@ solver
 simplex
 extended-solver
 BigM
+two-phase
