@@ -17,7 +17,11 @@ Operation Research Lab
 	- [x] Manual Problems
 	- [x] Code
 	- [x] File Work
-- [Lab 5](04-02-2016/problem.md): [04-02-2015] **Two Phase Simplex Method**
+- [Lab 5](04-02-2016/problem.md): [04-02-2016] **Two Phase Simplex Method**
 	- [ ] Manual Problems (1/2 done)
+	- [ ] Code
+	- [ ] File Work
+- [Lab 6](11-02-2016/Dual-Simplex Method.pdf): [11-02-2016] **Dual Simplex Method**
+	- [ ] Manual Problems
 	- [ ] Code
 	- [ ] File Work
