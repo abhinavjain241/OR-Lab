@@ -5,3 +5,4 @@ simplex
 extended-solver
 BigM
 two-phase
+dual_simplex
