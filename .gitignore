@@ -6,3 +6,4 @@ extended-solver
 BigM
 two-phase
 dual_simplex
+product_inverse
