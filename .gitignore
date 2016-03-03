@@ -1,4 +1,5 @@
 *.o
+*.in
 printout*
 solver
 simplex
