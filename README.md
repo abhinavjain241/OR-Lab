@@ -18,10 +18,18 @@ Operation Research Lab
 	- [x] Code
 	- [x] File Work
 - [Lab 5](04-02-2016/problem.md): [04-02-2016] **Two Phase Simplex Method**
-	- [ ] Manual Problems (1/2 done)
-	- [ ] Code
-	- [ ] File Work
+	- [x] Manual Problems
+	- [x] Code
+	- [x] File Work
 - [Lab 6](11-02-2016/Dual-Simplex Method.pdf): [11-02-2016] **Dual Simplex Method**
+	- [x] Manual Problems
+	- [x] Code
+	- [x] File Work
+- [Lab 7](25-02-2016/Product-Form-Inverse.pdf): [25-02-2016] **Product Form of Inverse**
+	- [x] Manual Problems
+	- [x] Code
+	- [x] File Work
+- [Lab 8](03-03-2016/Revised-Simplex-method.pdf): [03-03-2016] **Revised Simplex Method**
 	- [ ] Manual Problems
 	- [ ] Code
 	- [ ] File Work
